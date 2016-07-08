@@ -1,0 +1,943 @@
+<html>
+<head>
+<style>
+ button
+  {
+	  height:20px;
+	  width:55px;
+	  border-radius: 5px; 
+      cursor:pointer;
+	  background-color:#80ff80;
+	  border-color: transparent;
+	  color:#ffffb3;
+	  margin-left:49.5%;
+	  margin-top:15px;
+  }
+  div#board
+  {
+    width: 640px;
+    height: 640px;
+    margin: 20px;
+    border: 25px solid #000;
+  }
+  div.square_black
+  {
+    width: 160px;
+    height: 640px;
+    margin: 20px;
+    border: 10px solid #000;
+	background-color:#999999;
+  }
+   div.square_white
+  {
+    width: 160px;
+    height: 640px;
+    margin: 20px;
+    border: 10px solid #000;
+	background-color:#999999;
+  }
+  .default
+  { 
+     height:80px; 
+	  width:80px;
+	   background-color:#4d4d4d;
+	  float:left;
+	  text-align:center;
+	  display: table-cell;
+      vertical-align:middle;
+	  font-size:50px;
+  
+  }
+
+  .squareblack
+  {
+	  height:80px; 
+	  width:80px;
+	  background-color:#4d4d4d;
+	  float:left;
+	  text-align:center;
+	  display: table-cell;
+      vertical-align:middle;
+	  font-size:50px;
+  }
+  .squarewhite
+  {
+	  height:80px; 
+	  width:80px;
+	  background-color:#fff;
+	  float:left;
+	  text-align:center;
+	  display: table-cell;
+      vertical-align:middle;
+	  font-size:50px;
+  }
+  .fade
+ {
+	-webkit-transition: box-shadow 0.25s ease-out;
+	-moz-transition: box-shadow 0.25s ease-out;
+	transition: box-shadow 0.25s ease-out;
+
+	-webkit-transition: background-color 0.25s ease-in time;
+	-moz-transition: background-color 0.25s ease-in time;
+	transition: background-color 0.25s ease-in time;
+ }
+ 
+.legal
+{
+	-webkit-box-shadow: inset 0px 0px 0px 5px #f00;
+	-moz-box-shadow: inset 0px 0px 0px 5px #f00;
+	box-shadow: inset 0px 0px 0px 5px #f00;
+}
+
+.legal.squarewhite
+{
+	background-color: #D2AEAE;
+}
+
+.legal.squareblack
+{
+	background-color: #7E1818;
+}
+
+.legal:hover
+{
+	background-color: yellow;
+   -webkit-box-shadow: 0px 0px 25px 10px #ffa;
+    box-shadow: 0px 0px 25px 10px #ffa;
+}
+
+.hover
+{
+	-webkit-box-shadow: inset 0px 0px 5px 5px rgba(50, 150, 25, .5);
+	box-shadow: inset 0px 0px 5px 5px rgba(50, 150, 25, .5);
+}
+
+	
+*[class^="w"]
+{
+ font-size:50px;
+}
+*[class^="b"]
+{
+ font-size:50px;
+}
+.move
+{
+	-webkit-transition: top 0.35s ease-in-out, left 0.35s ease-in-out;
+	-moz-transition: top 0.35s ease-in-out, left 0.35s ease-in-out;
+	-ms-transition: top 0.35s ease-in-out, left 0.35s ease-in-out;
+	-o-transition: top 0.35s ease-in-out, left 0.35s ease-in-out;
+	transition: top 0.35s ease-in-out, left 0.35s ease-in-out;
+}
+</style>
+<script src="jquery-1.12.1.js"></script>
+<script>
+ pp1='v'+0+1;
+ pp2='k'+0+1;
+
+//function that highlight legal moves		   
+var legalMove = function(piece,detect)
+{
+    // alert("hi"); 
+	tiles.removeClass('legal');
+	gridpos=index_player(detect);
+	
+	
+	var col = gridpos[1];
+	var row = gridpos[0];
+    current=row+col;
+	
+	
+	
+	// legal moves for rook
+	if (piece == "rook"||piece=="queen")
+	{
+	     var flag=0;
+            
+		 
+		 //alert(current);
+		// rook traverse in four direction so 4 case
+       // case 1: upper side of rook		
+	     
+		for(var i=parseInt(gridpos[0])+1;i<=8;i++)
+		{
+			var ID = i+gridpos[1]; //error
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+					
+		}
+		 //case 2: lower side of rook
+		 var flag=0;
+		for(var i=parseInt(gridpos[0])-1;i>=1;i--)
+		{
+			var ID = i+gridpos[1];
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+					
+		}
+		//case 3: left side of rook
+	   for(var k=0;k<8;k++)
+	   {
+	   if(gridpos[1]==abc[k])
+	   {
+		var j=k;
+	   }
+	   }
+	   var flag=0;
+	   
+	   
+		for(var i=j-1;i>=0;i--)
+		{
+			var ID = gridpos[0]+abc[i]; //error
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+					
+		}
+    //case 4: right side of rook
+       var flag=0;
+	   
+	   
+		for(var i=j+1;i<8;i++)
+		{
+			var ID = gridpos[0]+abc[i]; //error
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+					
+		}	
+
+	}
+
+    if(piece=="knight")
+	{
+	  
+		for (var i = 0; i < 8; i++)
+		{
+			for (var j = 0; j < 8; j++)
+			{
+				if((col== abc[i]) && (row == file[j]))
+				{	
+				    l_col=i+1;
+				}    
+
+			}
+        }
+
+		
+		 //alert(row+l_col);
+		ID2=abc[parseInt(l_col)-2];
+		ID1=parseInt(row)+2;
+		ID=ID1+ID2;
+		
+		knightfunc(ID,detect);
+		
+		
+		ID2=abc[parseInt(l_col)];
+		ID1=parseInt(row)+2;
+		ID=ID1+ID2;
+		
+		knightfunc(ID,detect);
+		
+		ID2=abc[parseInt(l_col)-2];
+		ID1=parseInt(row)-2;
+		ID=ID1+ID2;
+		knightfunc(ID,detect);
+		
+		ID2=abc[parseInt(l_col)];
+		ID1=parseInt(row)-2;
+		ID=ID1+ID2;
+        knightfunc(ID,detect); 
+		
+		ID2=abc[parseInt(l_col)-3];
+		ID1=parseInt(row)+1;
+		ID=ID1+ID2;
+		
+		knightfunc(ID,detect);
+		
+		ID2=abc[parseInt(l_col)+1];
+		ID1=parseInt(row)-1;
+		ID=ID1+ID2;
+		knightfunc(ID,detect);
+		
+		ID2=abc[parseInt(l_col)+1];
+		ID1=parseInt(row)+1;
+		ID=ID1+ID2;
+	    knightfunc(ID,detect);
+		
+		ID2=abc[parseInt(l_col)-3];
+		ID1=parseInt(row)-1;
+		ID=ID1+ID2;
+		knightfunc(ID,detect);
+    }
+	
+	//alert('hiiii')
+	
+	if (piece == "king")
+	{
+	   
+       for (var i = 0; i < 8; i++)
+		{
+			for (var j = 0; j < 8; j++)
+			{
+				if((col== abc[i]) && (row == file[j]))
+				{	
+				    l_col=i+1;
+				}    
+
+			}
+
+
+		}	
+	    
+	
+		for (var i = l_col-1; i <= l_col+1 ; i++)
+		{	
+			for (var j = row-1; j <= parseInt(row)+1  ; j++)
+			{
+			if(j<=8&& j>0 && i<=8 && i>0)
+			{
+			var ID = file[j-1]+abc[i-1];
+		    	knightfunc(ID,detect);
+			//$('*[id="'+ID+'"]').addClass('legal');
+			}
+			}
+		}
+		$('*[id="'+current+'"]').removeClass('legal');
+	}
+  
+	
+	if(piece=="bishop"||piece=="queen")
+	{
+	  // alert("bishop");
+       for (var i = 0; i < 8; i++)
+		{
+			for (var j = 0; j < 8; j++)
+			{
+				if((col== abc[i]) && (row == file[j]))
+				{	
+				    l_col=i+1;
+				}    
+
+			}
+
+
+		}	
+	 
+	// case1 right top
+           flag=0;
+			for(i=1;(row-1+i)<8&&(l_col-1+i)<8&&(l_col-1+i)>=0&&(row-1+i)>=0;i++)
+			{
+			
+			var ID = file[row-1+i]+abc[l_col-1+i];
+			//alert(ID);
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+			
+			}
+			
+			
+			
+			//case 2 left down
+			flag=0
+			for(i=1;(row-1-i)<8&&(l_col-1-i)<8&&(l_col-1-i)>=0&&(row-1-i)>=0;i++)
+			{
+			
+			var ID = file[row-1-i]+abc[l_col-1-i];
+			//alert(ID);
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+			
+			}
+			//case 3 left top
+			flag=0;
+			for(i=1;((row-1)+i)<8&&((l_col-1)-i)<8&&((l_col-1)-i)>=0&&((row-1)+i)>=0;i++)
+			{
+		
+			var ID = file[(row-1)+i]+abc[(l_col-1)-i];
+			//alert(ID);
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+					   
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+			}
+			// case 4 right down
+			flag=0;
+			
+			for(i=1;((row-1)-i)<8&&((l_col-1)+i)<8&&((l_col-1)+i)>=0&&((row-1)-i)>=0;i++)
+			{
+
+			var ID = file[(row-1)-i]+abc[(l_col-1)+i];
+			
+			var yy=player_id(ID);
+			if(yy!=null&&flag==0)
+			{
+				
+			    flag=1;
+				if(detect[0]!=yy[0])
+				{
+				    $('*[id="'+ID+'"]').addClass('legal');
+					
+			    }
+				
+				   
+			}
+			else if(yy==null&&flag==0)
+			{
+			    $('*[id="'+ID+'"]').addClass('legal');
+				
+			}
+			}
+			
+		$('*[id="'+current+'"]').removeClass('legal');
+	}
+
+	if (piece == "pawn")
+	{   
+	    
+	    if(detect[0]=='b') 
+			c_row=parseInt(row)+1;
+		else
+			c_row=parseInt(row)-1;
+		var ID = c_row+col;
+		if(player_id(ID)==null)
+		  $('*[id="'+ID+'"]').addClass('legal');
+		
+		if(detect[0]=='b')
+        {
+		  c_row=parseInt(row)+1;
+		   for(var k=0;k<8;k++)
+	      {
+	       if(col==abc[k])
+	      {
+		     var j=k;
+	      }
+		  }
+   		  col1=abc[j+1];
+          col2=abc[j-1];
+		  var ID = c_row+col1;
+		  var p=player_id(ID);
+		  if(p[0]=='w')
+		  $('*[id="'+ID+'"]').addClass('legal');
+		  var ID = c_row+col2;
+		   var p=player_id(ID);
+		  if(p[0]=='w')
+		  $('*[id="'+ID+'"]').addClass('legal');
+		}	
+        else
+        {
+		  c_row=parseInt(row)-1;
+		   for(var k=0;k<8;k++)
+	      {
+	       if(col==abc[k])
+	      {
+		     var j=k;
+	      }
+		  }
+   		  col1=abc[j+1];
+          col2=abc[j-1];
+		  var ID = c_row+col1;
+		  var p=player_id(ID);
+		  if(p[0]=='b')
+		  $('*[id="'+ID+'"]').addClass('legal');
+		  var ID = c_row+col2
+		   var p=player_id(ID);
+		  if(p[0]=='b')
+		  $('*[id="'+ID+'"]').addClass('legal');
+		}		
+	}
+	
+
+}
+
+    //function that gives position of any index
+	
+	function pos(IIDD){	
+    
+ 	                                            
+	 // var midY = $('*[id="'+IIDD+'"]').position().top += ( $('*[id="'+IIDD+'"]').width() / 2 );
+     	var midY = $('*[id="'+IIDD+'"]').position().top += ( $('*[id="'+IIDD+'"]').width() / 2 );
+	    var midX = $('*[id="'+IIDD+'"]').position().left += ( $('*[id="'+IIDD+'"]').width() / 2 );		
+		var player = $("#pawn");
+		l=midX - (0.5 * player.width());		
+		t=midY - (0.5 * player.width());
+		var poss={top:t,left:l,};
+        return poss;	
+		
+	};
+	
+
+    //function that gives index of any position	
+	function index(position0)
+	{ 
+	   for(var i=0;i<8;i++)
+	   {
+			for(var j=0;j<8;j++)
+			{
+				if(position[i][j]==position0)
+				{
+				   
+				  l=8-i;;
+				  k=abc[j];
+				  return l+k;
+				
+				}
+			}
+	   }
+	
+	}
+	
+	
+	//function that give index of any player
+	function index_player(player0)
+	{ 
+	   for(var i=0;i<8;i++)
+	   {
+			for(var j=0;j<8;j++)
+			{
+				if(player[i][j]==player0)
+				{
+				   
+				  l=8-i;;
+				  k=abc[j];
+				  return l+k;
+				
+				}
+			}
+	   }
+	}
+	
+	function player_id(ID)
+	{
+				
+			
+		  i=8-ID[0];
+          j=10;
+	      for(var k=0;k<8;k++)
+	      {
+	       if(ID[1]==abc[k])
+	      {
+		    var j=k;
+	      }
+		  }
+		  
+        //  alert(j);
+		  if(i>=0&& j>=0 && i<8 && j<8)
+		  
+		  return player[i][j];
+	}
+	
+	function knightfunc(ID,det)
+	{
+        
+	     var yy=player_id(ID);
+          		 
+		if(yy!=null)
+		{				
+		if(det[0]!=yy[0])   $('*[id="'+ID+'"]').addClass('legal');			
+		}
+		else
+		$('*[id="'+ID+'"]').addClass('legal');
+	}
+	function set(player_id,index)
+	{
+	   
+	   var p=pos(index);
+	   
+	   var t=p["top"];
+	   var l=p["left"];
+	   var i=8-index[0];
+	   for(var k=0;k<8;k++)
+	   {
+	   if(index[1]==abc[k])
+	   {
+		var j=k;
+	   }
+	   
+	   }
+	   
+	   player[i][j]=player_id;
+	   $('*[class="'+player_id+'"]').css({ "position":"absolute","top":t, "left":l});
+	   
+	   
+	}
+	
+function del(ID)
+{
+    if(ID[0]=='w')
+	{
+	   //alert(pp1);
+	  var p1=pos(pp1);
+	  var t1=p1["top"];
+	  var l1=p1["left"];
+	  $('*[class="'+ID+'"]').css({ "position":"absolute","top":t1, "left":l1});
+	  var t=parseInt(pp1[1]+pp1[2])+1;
+	  if(t<10)
+	  pp1='v'+0+t;
+	  else
+	  pp1='v'+t;
+	  
+	}
+	
+	
+	   
+	if(ID[0]=='b')
+	
+	{
+	   //alert(pp2);
+	   var p2=pos(pp2);
+	     var t2=p2["top"];
+	   var l2=p2["left"];
+	   $('*[class="'+ID+'"]').css({ "position":"absolute","top":t2, "left":l2});
+	   
+	  var t=parseInt(pp2[1]+pp2[2])+1;
+	 
+	  if(t<10)
+	  { 
+	   pp2='k'+0+t;
+	    
+	  }
+	  else
+	  pp2='k'+t;
+	  
+	}
+	
+}
+
+
+
+
+
+$(document).ready(function()
+{ 
+abc = ["a","b","c","d","e","f","g","h"];
+file = [1,2,3,4,5,6,7,8];
+
+position=[ [pos('8a'),pos('8b'),pos('8c'),pos('8d'),pos('8e'),pos('8f'),pos('8g'),pos('8h')],
+	           [pos('7a'),pos('7b'),pos('7c'),pos('7d'),pos('7e'),pos('7f'),pos('7g'),pos('7h')],
+			   [pos('6a'),pos('6b'),pos('6c'),pos('6d'),pos('6e'),pos('6f'),pos('6g'),pos('6h')],
+			   [pos('5a'),pos('5b'),pos('5c'),pos('5d'),pos('5e'),pos('5f'),pos('5g'),pos('5h')],
+			   [pos('4a'),pos('4b'),pos('4c'),pos('4d'),pos('4e'),pos('4f'),pos('4g'),pos('4h')],
+			   [pos('3a'),pos('3b'),pos('3c'),pos('3d'),pos('3e'),pos('3f'),pos('3g'),pos('3h')],
+			   [pos('2a'),pos('2b'),pos('2c'),pos('2d'),pos('2e'),pos('2f'),pos('2g'),pos('2h')],
+			   [pos('1a'),pos('1b'),pos('1c'),pos('1d'),pos('1e'),pos('1f'),pos('1g'),pos('1h')]
+			   ];
+player=[
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null],
+			 [null,null,null,null,null,null,null,null]
+	    ];
+
+tiles = $(".fade");   
+	$(".fade").mouseenter(function(){ 
+		$(this).addClass('hover');
+	});
+
+	$(".fade").mouseleave(function(){
+		$(this).removeClass('hover');
+	});
+
+
+
+
+
+
+$(document).on('click', ".legal", function() {
+//alert('hii');
+ for(var i=0;i<8;i++)
+ {
+	for(var j=0;j<8;j++)
+		{
+			if(player[i][j]==crnt_player)
+			{
+				 player[i][j]=null;
+				
+			}
+		}
+}
+//alert(player_id($(this).attr('id')));
+//if(player_id($(this).attr('id'))!=null)
+//{
+  //del(player_id($(this).attr('id')));
+//}
+
+set(crnt_player,$(this).attr('id'));
+if(term==1)
+{
+term=0;
+}
+else if(term==0)
+{
+term=1;
+}
+tiles.removeClass('legal');
+crnt_player=null;
+
+});
+
+	
+	$("#start").click(function(){
+	
+	  term=0;
+	  
+	  set('wr1','8a');   set('wp1','7a');
+	  set('wk1','6b');   set('wp2','7b');
+	  set('wb1','8c');   set('wp3','7c');
+	  set('wl1','8d');	 set('wp4','7d');
+	  set('wq1','8e');	 set('wp5','7e');
+	  set('wb2','8f');	 set('wp6','7f');
+	  set('wk2','8g');   set('wp7','7g');
+	  set('wr2','8h');   set('wp8','7h');
+	  
+	  
+	  set('br1','1a');   set('bp1','2a');
+	  set('bk1','1b');   set('bp2','2b');
+	  set('bb1','1c');   set('bp3','2c');
+	  set('bl1','1d');	 set('bp4','2d');
+	  set('bq1','1e');	 set('bp5','2e');
+	  set('bb2','1f');	 set('bp6','2f');
+	  set('bk2','1g');   set('bp7','2g');
+	  set('br2','1h');   set('bp8','2h');
+	
+	
+        	
+	});
+	$("#test").click(function()
+	{
+	  
+	  
+	 
+	
+	}); 
+	
+	
+	
+	
+// when click on player
+
+
+
+$("[class^='w']").click(function()
+{
+  ind=index_player($(this).attr('class'));
+  //alert(ind); 
+  var t=$('*[id="'+ind+'"]').attr('class');
+  if(t[17]=='l')
+  {
+      for(var i=0;i<8;i++)
+	{
+		for(var j=0;j<8;j++)
+			{
+				if(player[i][j]==crnt_player)
+				{
+					player[i][j]=null;
+				
+				}
+			}
+	}
+	
+	del($(this).attr('class'));
+	set(crnt_player,ind);
+	if(term==1)
+	{
+		term=0;
+	}
+	else if(term==0)
+	{
+		term=1;
+	}
+	tiles.removeClass('legal');
+	crnt_player=null;
+  }
+  else
+  {
+	if(term==0)
+	{
+	crnt_player=$(this).attr('class');
+	legalMove($(this).attr('id'),$(this).attr('class'));
+  
+	}
+  }
+});
+
+$("[class^='b']").click(function()
+{
+    ind=index_player($(this).attr('class'));
+     //alert(ind)
+	 t=$('*[id="'+ind+'"]').attr('class');
+     if(t[17]=='l')
+    {
+      for(var i=0;i<8;i++)
+	{
+		for(var j=0;j<8;j++)
+			{
+				if(player[i][j]==crnt_player)
+				{
+					player[i][j]=null;
+				
+				}
+			}
+	}
+	
+	del($(this).attr('class'));
+	set(crnt_player,ind);
+	if(term==1)
+	{
+		term=0;
+	}
+	else if(term==0)
+	{
+		term=1;
+	}
+	tiles.removeClass('legal');
+	crnt_player=null;
+  }
+  else
+  {
+	if(term==1)
+	{
+		crnt_player=$(this).attr('class');
+		legalMove($(this).attr('id'),$(this).attr('class'));
+	}
+  }
+});
+
+    
+});
+
+
+</script>
+</head>
+<body>
+<div class="square_black" style="float:left;">
+<div class="default"  id="v01"><span id="rook" class="wr1" > &#9814 </span></div><div class="default"  id="v02"><span id="knight" class="wk1"> &#9816 </span></div><div class="default"  id="v03"><span id="bishop" class="wb1"> &#9815 </span></div><div class="default"  id="v04"><span id="queen" class="wq1"> &#9813 </span></div><div class="default"  id="v05"><span id="king" class="wl1"> &#9812 </span></div><div class="default"  id="v06"><span id="bishop" class="wb2"> &#9815 </span></div><div class="default"  id="v07"><span id="knight" class="wk2"> &#9816 </span></div><div class="default"  id="v08"><span id="rook" class="wr2"> &#9814 </span></div>
+<div class="default"  id="v09"><span id="pawn" class="wp1"> &#9817 </span></div><div class="default"  id="v10"><span id="pawn" class="wp2"> &#9817 </span></div><div class="default"  id="v11"><span id="pawn" class="wp3"> &#9817 </span></div><div class="default"  id="v12"><span id="pawn" class="wp4"> &#9817 </span></div><div class="default"  id="v13"><span id="pawn" class="wp5"> &#9817 </span></div><div class="default"  id="v14"><span id="pawn" class="wp6"> &#9817 </span></div><div class="default"  id="v15"><span id="pawn" class="wp7"> &#9817 </span></div><div class="default"  id="v16"><span id="pawn" class="wp8"> &#9817 </span></div>
+</div>
+<div id="board" style="float:left;" >
+<div id="8a" class="squarewhite fade"></div><div id="8b" class="squareblack fade"></div><div id="8c" class="squarewhite fade"></div><div id="8d" class="squareblack fade"></div><div id="8e" class="squarewhite fade"></div><div id="8f" class="squareblack fade"></div><div id="8g" class="squarewhite fade"></div><div id="8h" class="squareblack fade" ></div>
+<div id="7a" class="squareblack fade"></div><div id="7b" class="squarewhite fade"></div><div id="7c" class="squareblack fade"></div><div id="7d" class="squarewhite fade"></div><div id="7e" class="squareblack fade"></div><div id="7f" class="squarewhite fade"></div><div id="7g" class="squareblack fade"></div><div id="7h" class="squarewhite fade" ></div>
+<div id="6a" class="squarewhite fade"></div><div id="6b" class="squareblack fade"></div><div id="6c" class="squarewhite fade"></div><div id="6d" class="squareblack fade"></div><div id="6e" class="squarewhite fade"></div><div id="6f" class="squareblack fade"></div><div id="6g" class="squarewhite fade"></div><div id="6h" class="squareblack fade" ></div>
+<div id="5a" class="squareblack fade"></div><div id="5b" class="squarewhite fade"></div><div id="5c" class="squareblack fade"></div><div id="5d" class="squarewhite fade"></div><div id="5e" class="squareblack fade"></div><div id="5f" class="squarewhite fade"></div><div id="5g" class="squareblack fade"></div><div id="5h" class="squarewhite fade" ></div>
+<div id="4a" class="squarewhite fade"></div><div id="4b" class="squareblack fade"></div><div id="4c" class="squarewhite fade"></div><div id="4d" class="squareblack fade"></div><div id="4e" class="squarewhite fade"></div><div id="4f" class="squareblack fade"></div><div id="4g" class="squarewhite fade"></div><div id="4h" class="squareblack fade" ></div>
+<div id="3a" class="squareblack fade"></div><div id="3b" class="squarewhite fade"></div><div id="3c" class="squareblack fade"></div><div id="3d" class="squarewhite fade"></div><div id="3e" class="squareblack fade"></div><div id="3f" class="squarewhite fade"></div><div id="3g" class="squareblack fade"></div><div id="3h" class="squarewhite fade" ></div>
+<div id="2a" class="squarewhite fade"></div><div id="2b" class="squareblack fade"></div><div id="2c" class="squarewhite fade"></div><div id="2d" class="squareblack fade"></div><div id="2e" class="squarewhite fade"></div><div id="2f" class="squareblack fade"></div><div id="2g" class="squarewhite fade"></div><div id="2h" class="squareblack fade" ></div>
+<div id="1a" class="squareblack fade"></div><div id="1b" class="squarewhite fade"></div><div id="1c" class="squareblack fade"></div><div id="1d" class="squarewhite fade"></div><div id="1e" class="squareblack fade"></div><div id="1f" class="squarewhite fade"></div><div id="1g" class="squareblack fade"></div><div id="1h" class="squarewhite fade" ></div>
+
+</div>
+<div class="square_white" style="float:left;" >
+<div class="default"  id="k01"><span id="pawn" class="bp1"> &#9823 </span></div><div class="default"  id="k02"><span id="pawn" class="bp2"> &#9823 </span></div><div class="default"  id="k03"><span id="pawn" class="bp3"> &#9823 </span></div><div class="default"  id="k04"><span id="pawn" class="bp4"> &#9823 </span></div><div class="default"  id="k05"><span id="pawn" class="bp5"> &#9823 </span></div><div class="default"  id="k06"><span id="pawn" class="bp6"> &#9823 </span></div><div class="default"  id="k07"><span id="pawn" class="bp7"> &#9823 </span></div><div class="default"  id="k08"><span id="pawn" class="bp8"> &#9823 </span></div>
+<div class="default"  id="k09"><span id="rook" class="br1"> &#9820 </span></div><div class="default"  id="k10"><span id="knight" class="bk1"> &#9822 </span></div><div class="default"  id="k11"><span id="bishop" class="bb1"> &#9821 </span></div><div class="default"  id="k12"><span id="queen" class="bq1"> &#9819 </span></div><div class="default"  id="k13"><span id="king" class="bl1"> &#9818 </span></div><div class="default"  id="k14"><span id="bishop" class="bb2"> &#9821 </span></div><div class="default"  id="k15"><span id="knight" class="bk2"> &#9822 </span></div><div class="default"  id="k16"><span id="rook" class="br2"> &#9820 </span></div>
+</div>
+
+
+
+<button id="start">start</button>  
+<button id="test">test</button>  
+ </body>
+</html>
